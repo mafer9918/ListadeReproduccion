@@ -9,7 +9,10 @@ body, html {
 #mensajeError{
     visibility: hidden;
     background-color: rgb(172, 58, 58);
-    color: white;
+    color: rgb(12, 12, 12);
+    margin-top: 15px;
+    padding: 4px;
+    border-radius: 10px;
 }
 
 #loginForm{
@@ -35,7 +38,7 @@ input::placeholder {
     padding-left: 10px;
 }
 
-a{
+button{
     display: flex;
     justify-content: center;
     align-items: center;

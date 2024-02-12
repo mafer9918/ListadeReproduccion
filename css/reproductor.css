@@ -62,13 +62,13 @@ h2 {
     margin-bottom: 10px;
 }
 
-.buscador {
+.filter {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.buscador input[type="text"] {
+.filter input[type="text"] {
     flex: 1;
     margin-right: 5px;
     height: 30px;
@@ -86,7 +86,7 @@ input::placeholder {
     font-family: 'Nunito', sans-serif;
 }
 
-.buscador button {
+.filter button {
     width: 120px;
     height: 35px;
     border-radius: 15px;
@@ -97,7 +97,7 @@ input::placeholder {
     background-color: #10aa2f;
 }
 
-#listaCanciones,
+#busqueda,
 #playlist,
 #favoritos {
     height: 170px;
@@ -148,7 +148,13 @@ input::placeholder {
     cursor: pointer;
 }
 
-.red-heart {
-    color: red;
-    /* Cambia el color a rojo */
+#unmuteSong,
+#playSong {
+    visibility: visible;
+}
+
+#noSongs {
+    color: #FCF7F7;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
 }

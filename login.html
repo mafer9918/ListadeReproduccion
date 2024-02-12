@@ -10,18 +10,19 @@
 </head>
 
 <body>
-    <form id="loginForm">
+    <div id="loginForm">
         <span>Usuario:</span>
         <div>
-            <i class="fa-solid fa-user"></i> <input type="text" placeholder="Ingresar nombre de usuario" /><br><br>
+            <i class="fa-solid fa-user"></i> <input id="user" type="text" placeholder="Ingresar nombre de usuario" /><br><br>
         </div>
         <span>Contraseña:</span>
         <div>
-            <i class="fa-solid fa-lock"></i> <input type="password" placeholder="Ingresar contraseña" />
+            <i class="fa-solid fa-lock"></i> <input id="pass" type="password" placeholder="Ingresar contraseña" />
         </div>
-        <div id="mensajeError">Usuario o contraseña incorrectas. Intente nuevamente.</div>
-        <a href="reproductor.html">Iniciar sesión</a>
-    </form>
+        <div id="mensajeError"></div>
+        <button type="button" onclick="userInstance.verificarAcceso()">Iniciar sesión</button>
+    </div>
+    <script src="./js/login.js"></script>
 </body>
 
 </html>
