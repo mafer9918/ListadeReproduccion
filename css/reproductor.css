@@ -158,3 +158,26 @@ input::placeholder {
     font-family: 'Nunito', sans-serif;
     font-size: 16px;
 }
+
+.title{
+    display: grid;
+    grid-template-columns: 2fr auto;
+    align-content: center;
+}
+
+#logOut{
+    font-size: 24px;
+    color: #FCF7F7;
+    align-self: center;
+    margin: 20px;
+}
+
+.artistName{
+    font-size: 13px;
+}
+
+#cleanFilter{
+    font-size: 15px;
+    color: #FCF7F7;
+    margin-left: 150px;
+}
