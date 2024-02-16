@@ -9,10 +9,11 @@ h1 {
     font-family: 'Nunito', sans-serif;
 }
 
-h2 {
+.textPlaylist{
     color: #00d221;
     font-weight: 500;
     font-family: 'Nunito', sans-serif;
+    font-size: 18px;
 }
 
 .reproductor {
@@ -101,7 +102,6 @@ input::placeholder {
 #playlist,
 #favoritos {
     height: 170px;
-    margin-top: 10px;
     padding-left: 10px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -132,7 +132,7 @@ input::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: #08B11D;
     border-radius: 4px;
 }
 
@@ -179,5 +179,5 @@ input::placeholder {
 #cleanFilter{
     font-size: 15px;
     color: #FCF7F7;
-    margin-left: 150px;
+    margin-left: 210px;
 }

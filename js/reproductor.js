@@ -4,7 +4,7 @@ const busqueda = document.getElementById("busqueda");
 
 //Clase canciones
 class Song {
-    constructor(id, nombre, duracion, album, anio, genero, artista, portada, url, isInPlaylist = false, isFavorite = false, heartIcon, plusIcon) {
+    constructor(id, nombre, duracion, album, anio, genero, artista, portada, url, isInPlaylist = false, isFavorite = false) {
         this.id = id;
         this.nombre = nombre;
         this.duracion = duracion;
@@ -16,8 +16,6 @@ class Song {
         this.url = url;
         this.isInPlaylist = isInPlaylist;
         this.isFavorite = isFavorite;
-        this.heartIcon = heartIcon;
-        this.plusIcon = plusIcon;
     }
 
     getSongNameAndArtistAndGender() {
@@ -44,6 +42,14 @@ class PlayList {
         const index = this.canciones.findIndex(song => song.id === cancion.id);
         if (index !== -1) {
             this.canciones.splice(index, 1);
+            if (index === indiceActual) {
+                var audioActual = document.querySelector('audio');
+                audioActual.pause();
+            }
+            // Si la canción eliminada está antes de la actual, ajustar el índice de reproducción
+            else if (indice < indiceActual) {
+                indiceActual--;
+            }
         }
     }
 }
@@ -78,7 +84,7 @@ class Reproductor {
             new Song(15, "Earned it", "4:35", "50 sombras", "2015", "R&B", "The Weeknd", "15.jpg", "15.mp3"),
             new Song(16, "Quedate", "3:19", "Music Sessions", "2023", "Pop", "Quevedo, Bizarrap", "16.jpg", "16.mp3"),
             new Song(17, "One Last Time", "3:18", "My Everything", "2015", "Pop", "Ariana Grande", "17.jpg", "17.mp3"),
-            new Song(18, "Hasta la raiz", "3:40", "Single", "2015", "Pop", "Natalia Lafourcade", "18.jpg", "18.mp3"),
+            new Song(18, "Hasta la raiz", "3:40", "Single", "2015", "Alternativa", "Natalia Lafourcade", "18.jpg", "18.mp3"),
             new Song(19, "LaLa", "3:18", "El final del princio", "2023", "Urbano latino", "Myke Towers", "19.jpg", "19.mp3"),
             new Song(20, "Dark Horse", "3:45", "Prism", "2013", "Pop", "Katy Perry", "20.jpg", "20.mp3"),
             new Song(21, "Hello", "4:55", "25", "2015", "Soul", "Adele", "21.jpg", "21.mp3"),
@@ -92,16 +98,19 @@ class Reproductor {
             new Song(29, "Tuyo", "4:30", "Primer dia clases", "2021", "Urbano latino", "Mora", "29.jpg", "29.mp3"),
             new Song(30, "Tal vez", "4:24", "Homerun", "2019", "Urbano latino", "Paulo Londra", "30.jpeg", "30.mp3")
         ];
-        //Mostrar canciones
+        //Inicializar variables;
+        this.currentSong = this.catalogoCanciones[0];
+        this.currentIndex = 0;
+        this.currentPlaybackTime = undefined;
+        this.currentPlaylist = 'busqueda';
+        this.audio = new Audio();
+
+        //Llamada a funciones
         this.mostrarCanciones(this.catalogoCanciones);
         this.filtrarCanciones();
         this.logout();
         this.limpiarFiltro();
-        this.currentSong = this.catalogoCanciones[0];
-        this.currentIndex = 0;
-        this.audio = new Audio();
         this.showCurrentSong();
-        this.currentPlaybackTime = undefined;
 
         //Inicializar constructor de la clase Playlist
         this.busqueda = new PlayList({ nombre: "busqueda", canciones: this.catalogoCanciones, container: busqueda });
@@ -109,12 +118,11 @@ class Reproductor {
         this.favorites = new PlayList({ nombre: "favoritos", container: favoritos });
         this.renderList(this.mainPlaylist.canciones, this.mainPlaylist.container);
         this.renderList(this.favorites.canciones, this.favorites.container);
-        this.currentPlaylist = 'busqueda';
 
         //Llamada a la función play
         let playSong = document.getElementById("playSong");
         playSong.addEventListener('click', () => {
-            this.playSong(this.currentPlaylist, this.currentSong);
+            this.playSong();
         });
 
         //Llamada a la función pause
@@ -123,7 +131,7 @@ class Reproductor {
             this.pause();
         });
 
-        //Llamada a la función pause
+        //Llamada a la función stop
         let stopSong = document.getElementById("stopSong");
         stopSong.addEventListener('click', () => {
             this.stop();
@@ -132,13 +140,13 @@ class Reproductor {
         //Llamada a la funcion next
         let nextSong = document.getElementById("nextSong");
         nextSong.addEventListener('click', () => {
-            this.nextSong(this.currentPlaylist, this.currentIndex);
+            this.nextSong();
         });
 
         //Llamada a la funcion back
         let backSong = document.getElementById("backSong");
         backSong.addEventListener('click', () => {
-            this.backSong(this.currentPlaylist, this.currentIndex);
+            this.backSong();
         });
 
         //Llamada a la funcion mute
@@ -149,6 +157,11 @@ class Reproductor {
             } else {
                 this.mute(muteSong);
             }
+        });
+
+        //Funcion que cambia automaticamente de cancion
+        this.audio.addEventListener("ended", () => {
+            this.playNextSong();
         });
     }
 
@@ -173,9 +186,9 @@ class Reproductor {
         });
     }
 
-    playSong = function (containerId, currentSong) {
+    playSong = function () {
         let currentPlaylist;
-        switch (containerId) {
+        switch (this.currentPlaylist) {
             case "busqueda":
                 currentPlaylist = this.busqueda;
                 break;
@@ -189,11 +202,10 @@ class Reproductor {
                 console.error("ID de contenedor no válido");
                 return;
         }
-        const selectedSongIndex = currentPlaylist.canciones.findIndex(song => song.id === currentSong.id);
+        const selectedSongIndex = currentPlaylist.canciones.findIndex(song => song.id === this.currentSong.id);
         currentPlaylist.currentSongIndex = selectedSongIndex;
-        this.currentSong = currentSong
         this.currentPlaylist = currentPlaylist.container.id;
-        this.cambiarCancion(currentSong);
+        this.cambiarCancion();
     }
 
     pause = function () {
@@ -208,29 +220,28 @@ class Reproductor {
         this.audio.pause();
     }
 
-    cambiarCancion = function (cancion) {
+    cambiarCancion = function () {
         const cover = document.getElementById("imgPortada");
         const infoCancion = document.getElementById("infoCancion");
-        infoCancion.innerHTML = `<p> <strong>Nombre: </strong> ${cancion.nombre}</p>
-                                 <p> <strong>Duracion: </strong> ${cancion.duracion}</p>
-                                 <p> <strong>Albúm: </strong> ${cancion.album}</p>
-                                 <p> <strong>Año: </strong> ${cancion.anio}</p>
-                                 <p> <strong>Género: </strong> ${cancion.genero}</p>
-                                 <p> <strong>Artista: </strong> ${cancion.artista}</p>`
-        cover.src = "../src/portadas/" + cancion.portada;
-        this.audio.src = "../src/canciones/" + cancion.url;
+        infoCancion.innerHTML = `<p> <strong>Nombre: </strong> ${this.currentSong.nombre}</p>
+                                 <p> <strong>Duracion: </strong> ${this.currentSong.duracion}</p>
+                                 <p> <strong>Albúm: </strong> ${this.currentSong.album}</p>
+                                 <p> <strong>Año: </strong> ${this.currentSong.anio}</p>
+                                 <p> <strong>Género: </strong> ${this.currentSong.genero}</p>
+                                 <p> <strong>Artista: </strong> ${this.currentSong.artista}</p>`
+        cover.src = "../src/portadas/" + this.currentSong.portada;
+        this.audio.pause();
+        this.audio.src = "../src/canciones/" + this.currentSong.url;
         if (this.currentPlaybackTime !== undefined) {
             this.audio.currentTime = this.currentPlaybackTime;
             delete this.currentPlaybackTime;
         }
-        if (this.audio.paused || this.audio.ended) {
-            this.audio.play();
-        }
+        this.audio.play();
     }
 
-    nextSong = function (containerId, currentIndex) {
+    nextSong = function () {
         let currentPlaylist;
-        switch (containerId) {
+        switch (this.currentPlaylist) {
             case 'busqueda':
                 currentPlaylist = this.busqueda;
                 break;
@@ -244,7 +255,7 @@ class Reproductor {
                 console.error("Lista de reproducción no válida");
                 return;
         }
-        currentPlaylist.currentSongIndex = currentIndex;
+        currentPlaylist.currentSongIndex = this.currentIndex;
         currentPlaylist.currentSongIndex += 1;
 
         if (currentPlaylist.currentSongIndex >= currentPlaylist.canciones.length) {
@@ -255,12 +266,12 @@ class Reproductor {
         this.currentIndex = currentPlaylist.currentSongIndex;
         this.currentSong = nextSong;
         this.currentPlaylist = currentPlaylist.container.id;
-        this.cambiarCancion(nextSong);
+        this.cambiarCancion();
     }
 
-    backSong = function (containerId, currentIndex) {
+    backSong = function () {
         let currentPlaylist;
-        switch (containerId) {
+        switch (this.currentPlaylist) {
             case 'busqueda':
                 currentPlaylist = this.busqueda;
                 break;
@@ -274,7 +285,7 @@ class Reproductor {
                 console.error("Lista de reproducción no válida");
                 return;
         }
-        currentPlaylist.currentSongIndex = currentIndex;
+        currentPlaylist.currentSongIndex = this.currentIndex;
         currentPlaylist.currentSongIndex -= 1;
         if (currentPlaylist.currentSongIndex < 0) {
             currentPlaylist.currentSongIndex = currentPlaylist.canciones.length - 1;
@@ -283,7 +294,7 @@ class Reproductor {
         this.currentIndex = currentPlaylist.currentSongIndex;
         this.currentSong = backSong;
         this.currentPlaylist = currentPlaylist.container.id;
-        this.cambiarCancion(backSong);
+        this.cambiarCancion();
     }
 
     mute = function (muteSong) {
@@ -310,6 +321,41 @@ class Reproductor {
         cover.src = "../src/portadas/" + this.currentSong.portada;
     }
 
+    playNextSong = function () {
+        let currentPlaylist;
+        switch (this.currentPlaylist) {
+            case 'busqueda':
+                currentPlaylist = this.busqueda;
+                break;
+            case 'playlist':
+                currentPlaylist = this.mainPlaylist;
+                break;
+            case 'favoritos':
+                currentPlaylist = this.favorites;
+                break;
+            default:
+                console.error("Lista de reproducción no válida");
+                return;
+        }
+        currentPlaylist.currentSongIndex = this.currentIndex;
+        if (currentPlaylist.currentSongIndex < currentPlaylist.canciones.length - 1) {
+            currentPlaylist.currentSongIndex++;
+        } else {
+            currentPlaylist.currentSongIndex = 0;
+        }
+        const nextSong = currentPlaylist.canciones[currentPlaylist.currentSongIndex];
+        this.currentIndex = currentPlaylist.currentSongIndex;
+        this.currentSong = nextSong;
+        this.currentPlaylist = currentPlaylist.container.id;
+        this.cambiarCancionWithDelay(2000);
+    }
+
+    cambiarCancionWithDelay = function (delay) {
+        setTimeout(() => {
+            this.cambiarCancion();
+        }, delay);
+    }
+
     renderList = function (canciones, container) {
         let lista;
         if (canciones.length === 0) return container.innerHTML = `<p id="noSongs">No se han agregado canciones</p>`;
@@ -326,8 +372,8 @@ class Reproductor {
             const playIcon = document.createElement('i');
             playIcon.classList.add('fas', 'fa-play');
             playIcon.addEventListener('click', () => {
-                this.playSong(container.id, song);
                 this.currentPlaylist = container.id;
+                this.currentSong = song;
                 switch (container.id) {
                     case "busqueda":
                         lista = this.busqueda;
@@ -343,6 +389,7 @@ class Reproductor {
                         return;
                 }
                 this.currentIndex = lista.canciones.findIndex(x => x.id == song.id);
+                this.playSong();
             });
             const heartIcon = document.createElement('i');
             const plusIcon = document.createElement('i');
@@ -353,10 +400,7 @@ class Reproductor {
                         song.isFavorite = true;
                         this.favorites.addSong(song);
                         this.renderList(this.favorites.canciones, this.favorites.container);
-                        heartIcon.style.color = "red";
-                        song.heartIcon = heartIcon;
                     } else {
-                        song.heartIcon.style.color = "red";
                         alert("La canción " + song.nombre + " ya fue añadida a la lista de " + favoritos.id);
                     }
                 });
@@ -365,9 +409,6 @@ class Reproductor {
                     song.isInPlaylist = false;
                     this.mainPlaylist.removeSong(song);
                     this.renderList(canciones, container);
-                    song.plusIcon.classList.remove('fas', 'fa-check');
-                    song.plusIcon.classList.add('fas', 'fa-plus');
-                    song.plusIcon.style.color = "";
                 });
             } else if (container.id == "favoritos") {
                 heartIcon.classList.add('far', 'fa-heart');
@@ -375,7 +416,6 @@ class Reproductor {
                     song.isFavorite = false;
                     this.favorites.removeSong(song);
                     this.renderList(canciones, container);
-                    song.heartIcon.style.color = "";
                 });
                 plusIcon.classList.add('fas', 'fa-plus');
                 plusIcon.addEventListener('click', () => {
@@ -383,10 +423,6 @@ class Reproductor {
                         song.isInPlaylist = true;
                         this.mainPlaylist.addSong(song);
                         this.renderList(this.mainPlaylist.canciones, this.mainPlaylist.container);
-                        plusIcon.classList.remove('fas', 'fa-plus');
-                        plusIcon.classList.add('fas', 'fa-check');
-                        plusIcon.style.color = "green";
-                        song.plusIcon = plusIcon;
                     } else {
                         alert("La canción " + song.nombre + " ya fue añadida a la lista de " + playlist.id);
                     }
@@ -397,12 +433,9 @@ class Reproductor {
                 heartIcon.addEventListener("click", () => {
                     if (song.isFavorite == false) {
                         song.isFavorite = true;
-                        heartIcon.style.color = "red";
-                        song.heartIcon = heartIcon;
                         this.favorites.addSong(song);
                         this.renderList(this.favorites.canciones, this.favorites.container);
                     } else {
-                        song.heartIcon.style.color = "red";
                         alert("La canción " + song.nombre + " ya fue añadida a la lista de " + favoritos.id);
                     }
                 });
@@ -410,10 +443,6 @@ class Reproductor {
                 plusIcon.addEventListener('click', () => {
                     if (song.isInPlaylist == false) {
                         song.isInPlaylist = true;
-                        plusIcon.classList.remove('fas', 'fa-plus');
-                        plusIcon.classList.add('fas', 'fa-check');
-                        plusIcon.style.color = "green";
-                        song.plusIcon = plusIcon;
                         this.mainPlaylist.addSong(song);
                         this.renderList(this.mainPlaylist.canciones, this.mainPlaylist.container);
                     } else {
@@ -436,7 +465,7 @@ class Reproductor {
         });
     }
 
-    limpiarFiltro = function(){
+    limpiarFiltro = function () {
         const limpiar = document.getElementById("cleanFilter");
         let inputBuscar = document.getElementById("searchInput");
         limpiar.addEventListener("click", () => {
