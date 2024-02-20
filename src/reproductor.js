@@ -461,7 +461,7 @@ class Reproductor {
     logout = function () {
         const logout = document.getElementById("logOut");
         logout.addEventListener('click', () => {
-            window.location.href = "../login.html";
+            window.location.href = "login.html";
         });
     }
 
