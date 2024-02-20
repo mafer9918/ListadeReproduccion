@@ -15,7 +15,7 @@ class User {
         
         if (existe) {
             mensaje.style.visibility = 'hidden';
-            window.location.href = "./html/reproductor.html";
+            window.location.href = "reproductor.html";
         } else {
             mensaje.innerHTML = `<p>Usuario o contraseña incorrectas. Intente nuevamente.</p>`;
             mensaje.style.visibility = 'visible';

@@ -229,9 +229,9 @@ class Reproductor {
                                  <p> <strong>Año: </strong> ${this.currentSong.anio}</p>
                                  <p> <strong>Género: </strong> ${this.currentSong.genero}</p>
                                  <p> <strong>Artista: </strong> ${this.currentSong.artista}</p>`
-        cover.src = "../src/portadas/" + this.currentSong.portada;
+        cover.src = "../assets/portadas/" + this.currentSong.portada;
         this.audio.pause();
-        this.audio.src = "../src/canciones/" + this.currentSong.url;
+        this.audio.src = "../assets/canciones/" + this.currentSong.url;
         if (this.currentPlaybackTime !== undefined) {
             this.audio.currentTime = this.currentPlaybackTime;
             delete this.currentPlaybackTime;
@@ -318,7 +318,7 @@ class Reproductor {
                                  <p> <strong>Año: </strong> ${this.currentSong.anio}</p>
                                  <p> <strong>Género: </strong> ${this.currentSong.genero}</p>
                                  <p> <strong>Artista: </strong> ${this.currentSong.artista}</p>`
-        cover.src = "../src/portadas/" + this.currentSong.portada;
+        cover.src = "../assets/portadas/" + this.currentSong.portada;
     }
 
     playNextSong = function () {
