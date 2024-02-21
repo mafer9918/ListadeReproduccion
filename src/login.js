@@ -2,8 +2,8 @@ class User {
     users;
     constructor() {
         this.users = [
-            { "user": "usuario1", "pass": "pass123" },
-            { "user": "usuario2", "pass": "pass123" }
+            { "user": "tipti", "pass": "pass123" },
+            { "user": "grupo", "pass": "abc123" }
         ]
     }
 

@@ -42,14 +42,6 @@ class PlayList {
         const index = this.canciones.findIndex(song => song.id === cancion.id);
         if (index !== -1) {
             this.canciones.splice(index, 1);
-            if (index === indiceActual) {
-                var audioActual = document.querySelector('audio');
-                audioActual.pause();
-            }
-            // Si la canción eliminada está antes de la actual, ajustar el índice de reproducción
-            else if (indice < indiceActual) {
-                indiceActual--;
-            }
         }
     }
 }
