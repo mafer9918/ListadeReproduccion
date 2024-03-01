@@ -302,7 +302,6 @@ class Reproductor {
     }
 
     showCurrentSong = function () {
-        debugger;
         const cover = document.getElementById("imgPortada");
         const infoCancion = document.getElementById("infoCancion");
         infoCancion.innerHTML = `<p> <strong>Nombre: </strong> ${this.currentSong.nombre}</p>
